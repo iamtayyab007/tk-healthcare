@@ -8,19 +8,21 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { FieldType } from "./PatientForm";
+import { FieldType } from "./RegisterForm";
 import "react-phone-number-input/style.css";
 import Image from "next/image";
+import { FormValues, PatientFormValidation } from "@/lib/validationSchemas";
 
 interface FormProps {
   fullName?: string;
   email?: string;
-  control: Control<any>;
+  control?: Control<any>;
   label: string;
   placeholder: string;
   iconSrc: string;
   iconAlt: string;
   type: FieldType;
+  children?: React.ReactNode;
   phone?: string | undefined;
 }
 function RenderCustomField(props: FormProps) {
