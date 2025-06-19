@@ -8,7 +8,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { FieldType } from "./RegisterForm";
+import { FieldType } from "./RegistrationForm";
 import "react-phone-number-input/style.css";
 import Image from "next/image";
 import PhoneInput from "react-phone-number-input";

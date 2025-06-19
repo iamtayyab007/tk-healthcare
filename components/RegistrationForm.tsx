@@ -19,6 +19,7 @@ import { GenderOptions, PatientFormDefaultValues } from "@/contants";
 import DateSelector from "./DatePicker";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { UserInfo } from "os";
 
 export enum FieldType {
   FullName = "name",
@@ -42,16 +43,19 @@ export enum FieldType {
   IdentificationDocument = "identificationDocument",
 }
 
-export const RegistrationForm = () => {
+export const RegistrationForm = ({ user }: any) => {
   const router = useRouter();
   const form = useForm<z.infer<typeof PatientFormValidation>>({
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
       ...PatientFormDefaultValues,
+      fullName: user.name,
+      email: user.email,
+      phone: user.phone,
     },
   });
   async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
-    console.log(values);
+    console.log("values", values);
   }
   return (
     <>

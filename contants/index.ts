@@ -19,7 +19,7 @@ export const PatientFormDefaultValues = {
   pastMedicalHistory: "",
   identificationType: "",
   identificationNumber: "",
-  identificationDocument: [],
+  identificationDocument: [] as File[],
   treatmentConsent: false,
   disclosureConsent: false,
   privacyConsent: false,

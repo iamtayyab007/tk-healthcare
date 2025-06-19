@@ -1,8 +1,12 @@
-import { RegistrationForm } from "@/components/RegisterForm";
+import { RegistrationForm } from "@/components/RegistrationForm";
+import { getUser } from "@/lib/actions/patients.actions";
 import Image from "next/image";
 import React from "react";
 
-function Register() {
+async function Register({ params }: SearchParamProps) {
+  const { userId } = params;
+  const user = await getUser(userId);
+
   return (
     <div className="flex h-screen max-h-screen">
       <section className="relative flex-1 overflow-y-auto px-[5%]">
@@ -13,7 +17,7 @@ function Register() {
             width={100}
             alt="careplus logo"
           />
-          <RegistrationForm />
+          <RegistrationForm user={user} />
         </div>
       </section>
     </div>
