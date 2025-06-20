@@ -19,10 +19,10 @@ import { GenderOptions, PatientFormDefaultValues } from "@/contants";
 import DateSelector from "./DatePicker";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { UserInfo } from "os";
+import { useEffect } from "react";
 
 export enum FieldType {
-  FullName = "name",
+  FullName = "fullName",
   Email = "email",
   Phone = "phone",
   DateSelect = "dateOfBirth",
@@ -54,7 +54,14 @@ export const RegistrationForm = ({ user }: any) => {
       phone: user.phone,
     },
   });
+
+  useEffect(() => {
+    console.log("Form Errors:", form.formState.errors);
+  }, [form.formState.errors]);
   async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
+    console.log("Form Errors:", form.formState.errors);
+
+    console.log("clicked");
     console.log("values", values);
   }
   return (
@@ -94,9 +101,8 @@ export const RegistrationForm = ({ user }: any) => {
                           international
                           defaultCountry={"PK"}
                           placeholder="Enter phone number"
-                          {...field}
-                          // value={field.value}
-                          // onChange={(phone) => field.onChange(phone)}
+                          value={field.value}
+                          onChange={(phone) => field.onChange(phone)}
                           className="phone-input-wrapper"
                         />
                       </FormControl>
@@ -263,7 +269,7 @@ export const RegistrationForm = ({ user }: any) => {
                 />
               </div>
 
-              <div className="flex justify-between items-center">
+              {/* <div className="flex justify-between items-center">
                 <CustomFormField
                   control={form.control}
                   label="Identification Type"
@@ -272,7 +278,7 @@ export const RegistrationForm = ({ user }: any) => {
                   iconAlt=""
                   type={FieldType.SelectIdentificationType}
                 />
-              </div>
+              </div> */}
 
               <h2 className="font-bold">Identification and Verification</h2>
 
@@ -296,7 +302,7 @@ export const RegistrationForm = ({ user }: any) => {
                   type={FieldType.IdentificationNumber}
                 />
               </div>
-              <div className="flex justify-between items-center">
+              {/* <div className="flex justify-between items-center">
                 <CustomFormField
                   control={form.control}
                   label="Scanned Copy of Identification Document"
@@ -305,11 +311,11 @@ export const RegistrationForm = ({ user }: any) => {
                   iconAlt=""
                   type={FieldType.IdentificationDocument}
                 />
-              </div>
+              </div> */}
 
               <Button
                 type="submit"
-                className="bg-green-600 px-50 sm:px-auto mx-auto cursor-pointer hover:bg-gray-300 text-black"
+                className="bg-green-600 px-8 mx-auto cursor-pointer hover:bg-green-700 text-white"
               >
                 Submit and Continue
               </Button>

@@ -20,9 +20,9 @@ export const PatientFormDefaultValues = {
   identificationType: "",
   identificationNumber: "",
   identificationDocument: [] as File[],
-  treatmentConsent: false,
-  disclosureConsent: false,
-  privacyConsent: false,
+  // treatmentConsent: false,
+  // disclosureConsent: false,
+  // privacyConsent: false,
 };
 
 export const IdentificationTypes = [

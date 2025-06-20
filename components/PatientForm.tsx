@@ -19,7 +19,7 @@ import { createUser } from "@/lib/actions/patients.actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 export enum FieldType {
-  FullName = "name",
+  FullName = "fullName",
   Email = "email",
   Phone = "phone",
 }
@@ -91,9 +91,8 @@ export const PatientForm = () => {
                       international
                       defaultCountry={"PK"}
                       placeholder="Enter phone number"
-                      {...field}
-                      // value={field.value}
-                      // onChange={(phone) => field.onChange(phone)}
+                      value={field.value}
+                      onChange={(phone) => field.onChange(phone)}
                       className="phone-input-wrapper"
                     />
                   </FormControl>
