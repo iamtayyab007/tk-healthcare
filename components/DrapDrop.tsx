@@ -15,6 +15,8 @@ function DragDrop(props: any) {
       : [files];
 
     console.log("Processed fileArray:", fileArray);
+    // ✅ Send files to React Hook Form
+    props.onChange(fileArray);
 
     // if (fileArray[0] instanceof File) {
     //   const imageUrl = URL.createObjectURL(fileArray[0]);

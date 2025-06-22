@@ -1,5 +1,5 @@
 "use server";
-import { users } from "../appwrite.config";
+import { storage, users } from "../appwrite.config";
 import { ID, Models, Query } from "node-appwrite";
 import { parseStringify } from "../utils";
 
@@ -38,5 +38,18 @@ export const getUser = async (userId: string) => {
       "An error occurred while retrieving the user details:",
       error
     );
+  }
+};
+
+export const uploadFile = async (file: any) => {
+  try {
+    const response = await storage.createFile(
+      "68542b920021e7f993b2",
+      ID.unique(),
+      file
+    );
+    return response;
+  } catch (error: any) {
+    console.log("error", error?.response?.data);
   }
 };

@@ -20,6 +20,9 @@ import DateSelector from "./DatePicker";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useEffect } from "react";
+import { uploadFile } from "@/lib/actions/patients.actions";
+import { databases, storage } from "@/lib/appwrite.config";
+import { ID } from "node-appwrite";
 
 export enum FieldType {
   FullName = "fullName",
@@ -42,7 +45,7 @@ export enum FieldType {
   IdentificationNumber = "identificationNumber",
   IdentificationDocument = "identificationDocument",
 }
-
+const { DATABASE_ID, PATIENT_COLLECTION_ID } = process.env;
 export const RegistrationForm = ({ user }: any) => {
   const router = useRouter();
   const form = useForm<z.infer<typeof PatientFormValidation>>({
@@ -58,11 +61,69 @@ export const RegistrationForm = ({ user }: any) => {
   useEffect(() => {
     console.log("Form Errors:", form.formState.errors);
   }, [form.formState.errors]);
+
   async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
     console.log("Form Errors:", form.formState.errors);
 
-    console.log("clicked");
     console.log("values", values);
+    const formData = new FormData();
+    if (
+      values.identificationDocument &&
+      values.identificationDocument.length > 0
+    ) {
+      formData.append(
+        "identificationDocument",
+        values.identificationDocument[0]
+      ); // ✅ Only one file
+    } else {
+      console.error("No file selected");
+    }
+    console.log("File in FormData:", formData.get("identificationDocument"));
+
+    const file = values?.identificationDocument?.[0];
+    if (!file) {
+      return;
+    }
+    const uploaded = await uploadFile(file);
+    console.log("file uploaded", uploaded);
+    if (!uploaded) {
+      console.error("File upload failed.");
+      return;
+    }
+
+    const fileUrl = storage.getFileView("68542b920021e7f993b2", uploaded.$id);
+
+    try {
+      const newPatient = await databases.createDocument(
+        DATABASE_ID!,
+        PATIENT_COLLECTION_ID!,
+        ID.unique(),
+        {
+          userId: user,
+          fullName: values.fullName,
+          email: values.email,
+          phone: values.phone,
+          birthDate: new Date(Date.now()),
+          gender: values.gender,
+          address: values.address,
+          occupation: values.occupation,
+          emergencyContactName: values.emergencyContactName,
+          emergencyContactNumber: values.emergencyContactNumber,
+          primaryPhysician: values.primaryPhysician,
+          insuranceProvider: values.insuranceProvider,
+          insurancePolicyNumber: values.insurancePolicyNumber,
+          allergies: values.allergies,
+          currentMedication: values.currentMedication,
+          familyMedicalHistory: values.familyMedicalHistory,
+          pastMedicalHistory: values.pastMedicalHistory,
+          identificationType: values.identificationType,
+          identificationNumber: values.identificationNumber,
+          identificationDocument: fileUrl,
+        }
+      );
+    } catch (error: any) {
+      console.log("error", error?.response?.data);
+    }
   }
   return (
     <>
@@ -81,7 +142,7 @@ export const RegistrationForm = ({ user }: any) => {
                 iconAlt="user"
                 type={FieldType.FullName}
               />
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-5">
                 <CustomFormField
                   control={form.control}
                   label="Email"
@@ -302,7 +363,7 @@ export const RegistrationForm = ({ user }: any) => {
                   type={FieldType.IdentificationNumber}
                 />
               </div>
-              {/* <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center">
                 <CustomFormField
                   control={form.control}
                   label="Scanned Copy of Identification Document"
@@ -311,7 +372,7 @@ export const RegistrationForm = ({ user }: any) => {
                   iconAlt=""
                   type={FieldType.IdentificationDocument}
                 />
-              </div> */}
+              </div>
 
               <Button
                 type="submit"
