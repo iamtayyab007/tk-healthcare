@@ -19,10 +19,11 @@ import { GenderOptions, PatientFormDefaultValues } from "@/contants";
 import DateSelector from "./DatePicker";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useEffect } from "react";
-import { uploadFile } from "@/lib/actions/patients.actions";
+import { useEffect, useState } from "react";
+import { getFileUrl, uploadFile } from "@/lib/actions/patients.actions";
 import { databases, storage } from "@/lib/appwrite.config";
 import { ID } from "node-appwrite";
+import { parseStringify } from "@/lib/utils";
 
 export enum FieldType {
   FullName = "fullName",
@@ -45,8 +46,9 @@ export enum FieldType {
   IdentificationNumber = "identificationNumber",
   IdentificationDocument = "identificationDocument",
 }
-const { DATABASE_ID, PATIENT_COLLECTION_ID } = process.env;
+
 export const RegistrationForm = ({ user }: any) => {
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof PatientFormValidation>>({
     resolver: zodResolver(PatientFormValidation),
@@ -58,14 +60,15 @@ export const RegistrationForm = ({ user }: any) => {
     },
   });
 
-  useEffect(() => {
-    console.log("Form Errors:", form.formState.errors);
-  }, [form.formState.errors]);
+  // useEffect(() => {
+  //   console.log("Form Errors:", form.formState.errors);
+  // }, [form.formState.errors]);
 
   async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
-    console.log("Form Errors:", form.formState.errors);
+    setLoading(true);
+    // console.log("Form Errors:", form.formState.errors);
 
-    console.log("values", values);
+    // console.log("values", values);
     const formData = new FormData();
     if (
       values.identificationDocument &&
@@ -86,43 +89,20 @@ export const RegistrationForm = ({ user }: any) => {
     }
     const uploaded = await uploadFile(file);
     console.log("file uploaded", uploaded);
-    if (!uploaded) {
-      console.error("File upload failed.");
+    if (!uploaded || !uploaded.$id) {
+      console.error("Upload failed or file object is invalid");
       return;
     }
 
-    const fileUrl = storage.getFileView("68542b920021e7f993b2", uploaded.$id);
-
+    //const fileUrl = storage.getFileView("68542b920021e7f993b2", uploaded.$id);
     try {
-      const newPatient = await databases.createDocument(
-        DATABASE_ID!,
-        PATIENT_COLLECTION_ID!,
-        ID.unique(),
-        {
-          userId: user,
-          fullName: values.fullName,
-          email: values.email,
-          phone: values.phone,
-          birthDate: new Date(Date.now()),
-          gender: values.gender,
-          address: values.address,
-          occupation: values.occupation,
-          emergencyContactName: values.emergencyContactName,
-          emergencyContactNumber: values.emergencyContactNumber,
-          primaryPhysician: values.primaryPhysician,
-          insuranceProvider: values.insuranceProvider,
-          insurancePolicyNumber: values.insurancePolicyNumber,
-          allergies: values.allergies,
-          currentMedication: values.currentMedication,
-          familyMedicalHistory: values.familyMedicalHistory,
-          pastMedicalHistory: values.pastMedicalHistory,
-          identificationType: values.identificationType,
-          identificationNumber: values.identificationNumber,
-          identificationDocument: fileUrl,
-        }
-      );
+      const patientData = await getFileUrl(uploaded, values, user);
+      console.log("patient data", patientData);
+      router.push(`/patients/${user.$id}/new-appointment`);
     } catch (error: any) {
-      console.log("error", error?.response?.data);
+      console.log(error?.response?.data);
+    } finally {
+      setLoading(false);
     }
   }
   return (
@@ -131,7 +111,7 @@ export const RegistrationForm = ({ user }: any) => {
         <h1 className="text-2xl font-bold md:text-xl-bold">Welcome 👋 </h1>
         <p className="text-dark-700">Let's us know about yourself.</p>
         <h2 className="font-bold m-7">Personal Information</h2>
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center scrollbar-hide">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <CustomFormField
@@ -220,7 +200,7 @@ export const RegistrationForm = ({ user }: any) => {
                 />
               </div>
 
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-5">
                 <CustomFormField
                   control={form.control}
                   label="Address"
@@ -240,7 +220,7 @@ export const RegistrationForm = ({ user }: any) => {
                 />
               </div>
 
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-5">
                 <CustomFormField
                   control={form.control}
                   label="Emergency Contact Name"
@@ -273,7 +253,7 @@ export const RegistrationForm = ({ user }: any) => {
                 />
               </div>
 
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-5">
                 <CustomFormField
                   control={form.control}
                   label="Insurance Provider"
@@ -378,7 +358,7 @@ export const RegistrationForm = ({ user }: any) => {
                 type="submit"
                 className="bg-green-600 px-8 mx-auto cursor-pointer hover:bg-green-700 text-white"
               >
-                Submit and Continue
+                {loading ? "Loading..." : "Submit and Continue"}
               </Button>
             </form>
           </Form>
