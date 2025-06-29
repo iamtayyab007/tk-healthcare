@@ -260,6 +260,38 @@ function RenderCustomField({ field, props }: { field: any; props: FormProps }) {
           <FormMessage />
         </div>
       );
+    case FieldType.AppointmentReason:
+      return (
+        <div>
+          <FormControl>
+            <Textarea placeholder={placeholder} className="w-68" {...field} />
+          </FormControl>
+
+          <FormMessage />
+        </div>
+      );
+
+    case FieldType.AdditionalComments:
+      return (
+        <div>
+          <FormControl>
+            <Textarea placeholder={placeholder} className="w-68" {...field} />
+          </FormControl>
+
+          <FormMessage />
+        </div>
+      );
+
+    case FieldType.CancellationReason:
+      return (
+        <div>
+          <FormControl>
+            <Textarea placeholder={placeholder} className="w-68" {...field} />
+          </FormControl>
+
+          <FormMessage />
+        </div>
+      );
 
     case FieldType.PastMedicalHistory:
       return (

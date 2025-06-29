@@ -54,7 +54,7 @@ export const uploadFile = async (file: any) => {
     console.log("error", error?.response?.data);
   }
 };
-
+// this actions is for adding a patient data to the appwrite db
 export const getFileUrl = async (uploaded: any, values: any, user: any) => {
   try {
     const fileId = uploaded.$id;
@@ -99,5 +99,18 @@ export const getFileUrl = async (uploaded: any, values: any, user: any) => {
       error?.response?.data || error.message || error
     );
     return null; // <-- this makes sure it doesn't return undefined
+  }
+};
+
+export const getPatientData = async (userId: string) => {
+  try {
+    const result = await databases.listDocuments(
+      DATABASE_ID!, // databaseId
+      PATIENT_COLLECTION_ID!, // collectionId
+      [Query.equal("userId", userId)] // queries (optional)
+    );
+    return parseStringify(result.documents[0]);
+  } catch (error: any) {
+    console.log(error?.response?.data || error.message);
   }
 };

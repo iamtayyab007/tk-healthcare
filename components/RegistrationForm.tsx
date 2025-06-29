@@ -45,6 +45,9 @@ export enum FieldType {
   SelectIdentificationType = "identificationType",
   IdentificationNumber = "identificationNumber",
   IdentificationDocument = "identificationDocument",
+  AppointmentReason = "reason",
+  AdditionalComments = "note",
+  CancellationReason = "cancellationReason",
 }
 
 export const RegistrationForm = ({ user }: any) => {

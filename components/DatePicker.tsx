@@ -12,6 +12,8 @@ const DateSelector = ({ field }: { field: any }) => {
     <DatePicker
       selected={field.value}
       onChange={(date) => field.onChange(date)}
+      showTimeSelect
+      dateFormat={"MM/dd/yyyy - h:mm aa"}
       customInput={<CustomDateInput placeholder="select date" />}
     />
   );
