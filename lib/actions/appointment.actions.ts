@@ -1,3 +1,4 @@
+"use server";
 import { ID } from "node-appwrite";
 import { databases } from "../appwrite.config";
 import { parseStringify } from "../utils";
@@ -14,5 +15,18 @@ export const createAppointment = async (values: CreateAppointmentParams) => {
     return parseStringify(result);
   } catch (error: any) {
     console.log(error?.response?.data || error?.message);
+  }
+};
+
+export const getAppointmentDetails = async (id: string) => {
+  try {
+    const result = await databases.getDocument(
+      DATABASE_ID!,
+      APPOINTMENT_COLLECTION_ID!,
+      id
+    );
+    return parseStringify(result);
+  } catch (error: any) {
+    console.log(error?.response?.data || error.message);
   }
 };

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import CustomFormField from "./CustomFormField";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,7 @@ import { FieldType } from "./RegistrationForm";
 import { Button } from "./ui/button";
 import DateSelector from "./DatePicker";
 import { createAppointment } from "@/lib/actions/appointment.actions";
+import { useRouter } from "next/navigation";
 
 function AppointmentForm({
   userId,
@@ -27,6 +28,8 @@ function AppointmentForm({
   patientId: string;
   type: "create" | "cancel" | "schedule";
 }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof CreateAppointmentSchema>>({
     resolver: zodResolver(CreateAppointmentSchema),
     defaultValues: {
@@ -39,6 +42,7 @@ function AppointmentForm({
   });
 
   async function onSubmit(values: z.infer<typeof CreateAppointmentSchema>) {
+    setLoading(true);
     let status;
     switch (type) {
       case "cancel":
@@ -53,18 +57,30 @@ function AppointmentForm({
         break;
     }
 
-    if (type === "create" && patientId) {
-      const userAppointment = {
-        userId,
-        patient: patientId,
-        primaryPhysician: values.primaryPhysician,
-        schedule: new Date(values.schedule),
-        reason: values.reason,
-        note: values.note,
-        cancellationReason: values.cancellationReason,
-        status: status as Status,
-      };
-      const appointment = createAppointment(userAppointment);
+    try {
+      if (type === "create" && patientId) {
+        const userAppointment = {
+          userId,
+          patient: patientId,
+          primaryPhysician: values.primaryPhysician,
+          schedule: new Date(values.schedule),
+          reason: values.reason,
+          note: values.note,
+          cancellationReason: values.cancellationReason,
+          status: status as Status,
+        };
+        const appointment = await createAppointment(userAppointment);
+        if (appointment) {
+          form.reset();
+          router.push(
+            `/patients/${userId}/new-appointment/success?appointmentId=${appointment.$id}`
+          );
+        }
+      }
+    } catch (error: any) {
+      console.log(error?.response?.data || error?.message);
+    } finally {
+      setLoading(false);
     }
   }
   let buttonLabel;
@@ -149,7 +165,7 @@ function AppointmentForm({
             type="submit"
             className="bg-green-600 w-xl mx-auto cursor-pointer hover:bg-green-700 text-white"
           >
-            {buttonLabel}
+            {loading ? "loading..." : buttonLabel}
           </Button>
         </form>
       </Form>
