@@ -1,12 +1,17 @@
+"use client";
+import OtpVerification from "@/components/OtpVerification";
 import { PatientForm } from "@/components/PatientForm";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
+export default function Home({ searchParams }: SearchParamProps) {
+  const isAdmin = searchParams.admin;
+  const adminAlreadyLogin = localStorage.getItem("adminOtp");
   return (
     <div className="flex h-screen max-h-screen">
       {/* TODO: OTP Verification | passkey modal*/}
+      {isAdmin && <OtpVerification isAdmin={isAdmin} />}
+
       <section className="remove-scrollbar container my-auto">
         <div className="mx-auto flex size-full flex-col py-10 max-w-[496px] ">
           <Image
@@ -22,7 +27,10 @@ export default function Home() {
             <p className="justify-items-end text-dark-600 xl:text-left">
               © 2024 CarePlus
             </p>
-            <Link href="/?admin=true" className="text-green-300">
+            <Link
+              href={`${adminAlreadyLogin ? "/admin" : "/?admin=true"}`}
+              className="text-green-300"
+            >
               Admin
             </Link>
           </div>

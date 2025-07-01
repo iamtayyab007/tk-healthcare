@@ -2,8 +2,10 @@ import { getAppointmentDetails } from "@/lib/actions/appointment.actions";
 import Image from "next/image";
 import React from "react";
 import { Doctors } from "@/contants";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-async function Success({ searchParams }: SearchParamProps) {
+async function Success({ searchParams, params: { userId } }: SearchParamProps) {
   const appointmentId = (searchParams?.appointmentId as string) || "";
   const reqAppointmentDetails = await getAppointmentDetails(appointmentId);
   const date = new Date(reqAppointmentDetails.schedule);
@@ -11,7 +13,6 @@ async function Success({ searchParams }: SearchParamProps) {
     dateStyle: "long", // e.g., June 30, 2025
     timeStyle: "short", // e.g., 6:33 PM
   });
-  console.log("appointment", reqAppointmentDetails);
 
   const doctorImage = Doctors.find(
     (doctor) => doctor.name === reqAppointmentDetails.primaryPhysician
@@ -21,20 +22,24 @@ async function Success({ searchParams }: SearchParamProps) {
     <div className="h-screen max-h-screen px-[5%] py-11">
       <section className="flex flex-col justify-center items-center">
         <div className="flex justify-center items-center">
-          <Image
-            src="/assets/icons/logo-full.svg"
-            width={150}
-            height={150}
-            alt="logo"
-          />
+          <Link href="/">
+            <Image
+              src="/assets/icons/logo-full.svg"
+              width={150}
+              height={150}
+              alt="logo"
+              className="cursor-pointer"
+            />
+          </Link>
         </div>
 
-        <div className="flex flex-col justify-center items-center h-[calc(100vh-150px)]">
+        <div className="flex flex-col justify-center items-center h-[calc(100vh-250px)]">
           <Image
             src="/assets/gifs/success.gif"
             width={300}
             height={300}
             alt="logo"
+            className="cursor-pointer"
           />
 
           <h1 className="font-bold text-2xl">
@@ -70,6 +75,11 @@ async function Success({ searchParams }: SearchParamProps) {
             {formattedSchedule}
           </p>
         </div>
+        <Button className="bg-green-700 mt-5">
+          <Link href={`/patients/${userId}/new-appointment`}>
+            New Appointment
+          </Link>
+        </Button>
       </section>
     </div>
   );
