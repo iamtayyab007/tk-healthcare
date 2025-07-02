@@ -10,7 +10,8 @@ interface GetUser {
   email: string;
   phone: string;
 }
-const { DATABASE_ID, PATIENT_COLLECTION_ID } = process.env;
+const { DATABASE_ID, PATIENT_COLLECTION_ID, APPOINTMENT_COLLECTION_ID } =
+  process.env;
 export const createUser = async (user: CreateUserParams) => {
   try {
     const newUser = await users.create(
@@ -112,5 +113,56 @@ export const getPatientData = async (userId: string) => {
     return parseStringify(result.documents[0]);
   } catch (error: any) {
     console.log(error?.response?.data || error.message);
+  }
+};
+export const getAllPatientData = async () => {
+  // try {
+  //   const result = await databases.listDocuments(
+  //     DATABASE_ID!, // databaseId
+  //     PATIENT_COLLECTION_ID!, // collectionId
+  //     [Query.orderDesc("$createdAt")] // queries (optional)
+  //   );
+  //   return parseStringify(result.documents);
+  // } catch (error: any) {
+  //   console.log(error?.response?.data || error.message);
+  // }
+
+  try {
+    // 1. Get all patients
+    const patientResult = await databases.listDocuments(
+      DATABASE_ID!,
+      PATIENT_COLLECTION_ID!,
+      [Query.orderDesc("$createdAt")]
+    );
+
+    const patients = patientResult.documents;
+
+    // 2. Enrich each patient with their appointment data
+    const enrichedPatients = await Promise.all(
+      patients.map(async (patient) => {
+        // You can query appointment by relation field or userId
+        const appointmentResult = await databases.listDocuments(
+          DATABASE_ID!,
+          APPOINTMENT_COLLECTION_ID!,
+          [
+            // If you use a relation field
+            Query.equal("patient", patient.$id),
+
+            // OR if you're using a userId string
+            // Query.equal("userId", patient.userId)
+          ]
+        );
+
+        return {
+          ...patient,
+          appointments: appointmentResult.documents, // array of appointment objects
+        };
+      })
+    );
+
+    return parseStringify(enrichedPatients);
+  } catch (error: any) {
+    console.error(error?.response?.data || error.message);
+    return [];
   }
 };

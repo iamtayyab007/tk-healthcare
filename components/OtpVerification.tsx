@@ -29,7 +29,7 @@ function OtpVerification({ isAdmin }: any) {
   const encrypted = encrypt(adminOtp);
 
   const decrypted = decrypt(encrypted);
-  localStorage.setItem("adminOtp", encrypted);
+  //localStorage.setItem("adminOtp", encrypted);
 
   useEffect(() => {
     if (isAdmin) {
@@ -41,6 +41,7 @@ function OtpVerification({ isAdmin }: any) {
     if (value === decrypted) {
       setSuccess(true);
       router.push("/admin");
+      localStorage.setItem("adminOtp", encrypted);
       setError(false);
     } else {
       setError(true);
@@ -66,13 +67,20 @@ function OtpVerification({ isAdmin }: any) {
             onChange={(value) => setValue(value)}
           >
             <InputOTPGroup>
-              <InputOTPSlot index={0} />
+              {[...Array(6)].map((_, i) => (
+                <InputOTPSlot
+                  key={i}
+                  index={i}
+                  className="border border-gray-500 data-[active=true]:border-green-300 focus:border-green-500 outline-none"
+                />
+              ))}
+              {/* <InputOTPSlot index={0} />
               <InputOTPSlot index={1} />
               <InputOTPSlot index={2} />
 
               <InputOTPSlot index={3} />
               <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
+              <InputOTPSlot index={5} /> */}
             </InputOTPGroup>
           </InputOTP>
         </DialogHeader>

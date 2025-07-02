@@ -30,3 +30,28 @@ export const getAppointmentDetails = async (id: string) => {
     console.log(error?.response?.data || error.message);
   }
 };
+
+export const getAppointmentStatus = async () => {
+  try {
+    const result = await databases.listDocuments(
+      DATABASE_ID!,
+      APPOINTMENT_COLLECTION_ID!
+    );
+
+    const dataCount = result.documents.map((stat) => stat.status);
+
+    const statusCount = dataCount.reduce((acc, status) => {
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {});
+    console.log("status", statusCount);
+    const data = {
+      pending: statusCount.pending || 0,
+      schedule: statusCount.scheduled || 0,
+      cancelled: statusCount.cancelled || 0,
+    };
+    return parseStringify(data);
+  } catch (error: any) {
+    console.log(error?.response?.data || error.message);
+  }
+};
