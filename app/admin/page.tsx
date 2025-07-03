@@ -1,6 +1,9 @@
 import Image from "next/image";
 import Status from "@/components/Status";
-import { getAppointmentStatus } from "@/lib/actions/appointment.actions";
+import {
+  appointmentDetails,
+  getAppointmentStatus,
+} from "@/lib/actions/appointment.actions";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { getAllPatientData } from "@/lib/actions/patients.actions";
@@ -11,8 +14,9 @@ export default async function Admin() {
   const cancelled = getAppointmentData.cancelled;
   //console.log("appointment", getAppointmentData);
 
-  const PatientData = await getAllPatientData();
-  console.log("patientData", PatientData);
+  //const PatientData = await getAllPatientData();
+  const fetchAppointmentData = await appointmentDetails();
+  console.log("appointmentDetails", fetchAppointmentData);
 
   return (
     <div className="h-screen max-h-screen px-5 py-3">
@@ -47,7 +51,7 @@ export default async function Admin() {
       </section>
 
       <section>
-        <DataTable columns={columns} data={PatientData} />
+        <DataTable columns={columns} data={fetchAppointmentData} />
       </section>
     </div>
   );

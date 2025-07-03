@@ -55,3 +55,16 @@ export const getAppointmentStatus = async () => {
     console.log(error?.response?.data || error.message);
   }
 };
+
+export const appointmentDetails = async () => {
+  try {
+    const result = await databases.listDocuments(
+      DATABASE_ID!,
+      APPOINTMENT_COLLECTION_ID!
+    );
+
+    return parseStringify(result.documents);
+  } catch (error: any) {
+    console.log(error?.response?.data || error.message);
+  }
+};
