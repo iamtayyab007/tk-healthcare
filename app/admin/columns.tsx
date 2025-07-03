@@ -71,11 +71,15 @@ export const columns: ColumnDef<Appointment>[] = [
     header: "Date",
     cell: ({ row }) => {
       const date = new Date(row.original.schedule);
-      return date.toLocaleDateString("en-US", {
+      return `${date.toLocaleDateString("en-US", {
         year: "numeric",
-        month: "short", // "Jan", "Feb", etc.
-        day: "numeric", // 1, 2, 3...
-      });
+        month: "short",
+        day: "numeric",
+      })} ${date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true, // for AM/PM format
+      })}`;
     },
   },
   {
