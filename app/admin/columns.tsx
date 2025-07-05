@@ -15,36 +15,37 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
+import AppointmentModal from "@/components/AppointmentModal";
 
 export const columns: ColumnDef<Appointment>[] = [
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const patient = row.original.patient.userId;
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     const patient = row.original.patient.userId;
 
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="center" className="bg-gray-600">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(patient)}
-            >
-              Copy patient id
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
+  //     return (
+  //       <DropdownMenu>
+  //         <DropdownMenuTrigger asChild>
+  //           <Button variant="ghost" className="h-8 w-8 p-0">
+  //             <span className="sr-only">Open menu</span>
+  //             <MoreHorizontal className="h-4 w-4" />
+  //           </Button>
+  //         </DropdownMenuTrigger>
+  //         <DropdownMenuContent align="center" className="bg-gray-600">
+  //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+  //           <DropdownMenuItem
+  //             onClick={() => navigator.clipboard.writeText(patient)}
+  //           >
+  //             Copy patient id
+  //           </DropdownMenuItem>
+  //           <DropdownMenuSeparator />
+  //           <DropdownMenuItem>View customer</DropdownMenuItem>
+  //           <DropdownMenuItem>View payment details</DropdownMenuItem>
+  //         </DropdownMenuContent>
+  //       </DropdownMenu>
+  //     );
+  //   },
+  // },
 
   {
     accessorKey: "#",
@@ -111,7 +112,27 @@ export const columns: ColumnDef<Appointment>[] = [
   },
 
   {
-    accessorKey: "",
+    id: "actions",
     header: "Actions",
+    cell: ({ row }) => {
+      const data = {
+        cancel: "cancel",
+        schedule: "schedule",
+      };
+      const patientId = row.original.patient.$id;
+      const userId = row.original.userId;
+      const appointment = row.original;
+
+      return (
+        <div className="flex flex-row gap-1">
+          <AppointmentModal
+            data={data}
+            patientId={patientId}
+            userId={userId}
+            appointment={appointment}
+          />
+        </div>
+      );
+    },
   },
 ];

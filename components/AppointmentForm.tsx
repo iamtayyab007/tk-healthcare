@@ -18,26 +18,32 @@ import { Button } from "./ui/button";
 import DateSelector from "./DatePicker";
 import { createAppointment } from "@/lib/actions/appointment.actions";
 import { useRouter } from "next/navigation";
+import { Appointment } from "@/types/appwrite.types";
 
 function AppointmentForm({
   userId,
   patientId,
   type,
+  appointment,
 }: {
   userId: string;
   patientId: string;
   type: "create" | "cancel" | "schedule";
+  appointment?: Appointment;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  console.log("column", appointment);
+  console.log("patientid", patientId);
+
   const form = useForm<z.infer<typeof CreateAppointmentSchema>>({
     resolver: zodResolver(CreateAppointmentSchema),
     defaultValues: {
-      primaryPhysician: "",
+      primaryPhysician: appointment?.primaryPhysician || "",
       schedule: new Date(),
-      reason: "",
-      note: "",
-      cancellationReason: "",
+      reason: appointment?.reason,
+      note: appointment?.note,
+      cancellationReason: appointment?.cancellationReason || "",
     },
   });
 
@@ -86,19 +92,22 @@ function AppointmentForm({
   let buttonLabel;
   switch (type) {
     case "cancel":
-      buttonLabel = "cancel Appointment";
+      buttonLabel = "Cancel Appointment";
       break;
 
     case "create":
-      buttonLabel = "create Appointment";
+      buttonLabel = "Create Appointment";
       break;
     case "schedule":
-      buttonLabel = "schedule Appointment";
+      buttonLabel = "Schedule Appointment";
   }
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-8 px-2 md:px-4 w-full"
+        >
           {type !== "cancel" && (
             <>
               <div>
@@ -120,14 +129,16 @@ function AppointmentForm({
                   iconAlt=""
                   type={FieldType.AppointmentReason}
                 />
-                <CustomFormField
-                  control={form.control}
-                  label="Additional Comments/Notes"
-                  placeholder="ex: prefer afternoon appointments, if possible"
-                  iconSrc=""
-                  iconAlt=""
-                  type={FieldType.AdditionalComments}
-                />
+                {type !== "schedule" && (
+                  <CustomFormField
+                    control={form.control}
+                    label="Additional Comments/Notes"
+                    placeholder="ex: prefer afternoon appointments, if possible"
+                    iconSrc=""
+                    iconAlt=""
+                    type={FieldType.AdditionalComments}
+                  />
+                )}
               </div>
 
               <div>
@@ -163,7 +174,11 @@ function AppointmentForm({
 
           <Button
             type="submit"
-            className="bg-green-600 w-xl mx-auto cursor-pointer hover:bg-green-700 text-white"
+            className={`${
+              type === "cancel"
+                ? "bg-red-600 w-sm mx-auto cursor-pointer hover:bg-red-700 text-white"
+                : "bg-green-600 w-sm mx-auto cursor-pointer hover:bg-green-700 text-white"
+            }`}
           >
             {loading ? "loading..." : buttonLabel}
           </Button>

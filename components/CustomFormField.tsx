@@ -162,7 +162,7 @@ function RenderCustomField({ field, props }: { field: any; props: FormProps }) {
         <div>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
-              <SelectTrigger className="w-xl ">
+              <SelectTrigger className="w-sm">
                 <SelectValue placeholder="Select a Doctor" />
               </SelectTrigger>
             </FormControl>
