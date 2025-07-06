@@ -12,11 +12,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { CreateAppointmentSchema } from "@/lib/validationSchemas";
+import {
+  CreateAppointmentSchema,
+  getAppointmentSchema,
+} from "@/lib/validationSchemas";
 import { FieldType } from "./RegistrationForm";
 import { Button } from "./ui/button";
 import DateSelector from "./DatePicker";
-import { createAppointment } from "@/lib/actions/appointment.actions";
+import {
+  createAppointment,
+  updateAppointmentData,
+} from "@/lib/actions/appointment.actions";
 import { useRouter } from "next/navigation";
 import { Appointment } from "@/types/appwrite.types";
 
@@ -25,33 +31,38 @@ function AppointmentForm({
   patientId,
   type,
   appointment,
+  setOpen,
 }: {
   userId: string;
   patientId: string;
-  type: "create" | "cancel" | "schedule";
+  type: "create" | "cancelled" | "schedule";
   appointment?: Appointment;
+  setOpen?: (open: boolean) => void;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   console.log("column", appointment);
   console.log("patientid", patientId);
-
-  const form = useForm<z.infer<typeof CreateAppointmentSchema>>({
-    resolver: zodResolver(CreateAppointmentSchema),
+  const AppointmentSchema = getAppointmentSchema(type);
+  const form = useForm<z.infer<typeof AppointmentSchema>>({
+    resolver: zodResolver(AppointmentSchema),
     defaultValues: {
       primaryPhysician: appointment?.primaryPhysician || "",
-      schedule: new Date(),
+      schedule: appointment?.schedule
+        ? new Date(appointment.schedule)
+        : new Date(),
+
       reason: appointment?.reason,
       note: appointment?.note,
       cancellationReason: appointment?.cancellationReason || "",
     },
   });
-
-  async function onSubmit(values: z.infer<typeof CreateAppointmentSchema>) {
+  console.log("type", type);
+  async function onSubmit(values: z.infer<typeof AppointmentSchema>) {
     setLoading(true);
     let status;
     switch (type) {
-      case "cancel":
+      case "cancelled":
         status = "cancelled";
         break;
 
@@ -66,13 +77,21 @@ function AppointmentForm({
     try {
       if (type === "create" && patientId) {
         const userAppointment = {
+          // userId,
+          // patient: patientId,
+          // primaryPhysician: values.primaryPhysician,
+          // schedule: new Date(values.schedule),
+          // reason: values.reason,
+          // note: values.note,
+          // cancellationReason: values.cancellationReason,
+          // status: status as Status,
           userId,
           patient: patientId,
-          primaryPhysician: values.primaryPhysician,
+          primaryPhysician: values.primaryPhysician ?? "",
           schedule: new Date(values.schedule),
-          reason: values.reason,
-          note: values.note,
-          cancellationReason: values.cancellationReason,
+          reason: values.reason ?? "",
+          note: values.note ?? "",
+          cancellationReason: values.cancellationReason ?? "",
           status: status as Status,
         };
         const appointment = await createAppointment(userAppointment);
@@ -81,6 +100,25 @@ function AppointmentForm({
           router.push(
             `/patients/${userId}/new-appointment/success?appointmentId=${appointment.$id}`
           );
+        }
+      } else if (type === "schedule") {
+        if (!appointment?.$id) {
+          throw new Error("Appointment ID is missing");
+        }
+        const updateAppointment = {
+          userId,
+          patientId,
+          appointmentId: appointment?.$id,
+          primaryPhysician: values.primaryPhysician,
+          schedule: new Date(values.schedule).toISOString(),
+          reason: values.reason ?? "",
+          status: type,
+        };
+        console.log("values", updateAppointment);
+        const result = await updateAppointmentData(updateAppointment);
+        console.log("updated result", result);
+        if (result) {
+          setOpen!(false);
         }
       }
     } catch (error: any) {
@@ -91,7 +129,7 @@ function AppointmentForm({
   }
   let buttonLabel;
   switch (type) {
-    case "cancel":
+    case "cancelled":
       buttonLabel = "Cancel Appointment";
       break;
 
@@ -108,7 +146,7 @@ function AppointmentForm({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 px-2 md:px-4 w-full"
         >
-          {type !== "cancel" && (
+          {type !== "cancelled" && (
             <>
               <div>
                 <CustomFormField
@@ -161,7 +199,7 @@ function AppointmentForm({
             </>
           )}
 
-          {type === "cancel" && (
+          {type === "cancelled" && (
             <CustomFormField
               control={form.control}
               label="Cancellation Reason"
@@ -175,7 +213,7 @@ function AppointmentForm({
           <Button
             type="submit"
             className={`${
-              type === "cancel"
+              type === "cancelled"
                 ? "bg-red-600 w-sm mx-auto cursor-pointer hover:bg-red-700 text-white"
                 : "bg-green-600 w-sm mx-auto cursor-pointer hover:bg-green-700 text-white"
             }`}

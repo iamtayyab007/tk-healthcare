@@ -2,6 +2,7 @@ import React from "react";
 import { StatusIcon } from "@/contants";
 import Image from "next/image";
 function StatusForTable({ status }: any) {
+  console.log("status", status);
   if (status === "schedule") {
     return (
       <div className="flex flex-row items-center gap-1">

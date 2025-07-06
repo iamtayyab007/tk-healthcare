@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -21,17 +22,21 @@ function AppointmentModal({
   userId: string;
   appointment?: Appointment;
 }) {
+  const [open, setOpen] = useState(false);
   const cancel = data.cancel;
   const schedule = data.schedule;
 
   return (
     <div className="flex gap-1">
       {schedule && (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger className="text-green-400 cursor-pointer">
             Schedule
           </DialogTrigger>
-          <DialogContent className="bg-gray-900 w-screen">
+          <DialogContent
+            className="bg-gray-900 w-screen"
+            onInteractOutside={(e) => e.preventDefault()}
+          >
             <DialogHeader>
               <DialogTitle>Schedule Appointment</DialogTitle>
               <DialogDescription>
@@ -44,6 +49,7 @@ function AppointmentModal({
               patientId={patientId}
               userId={userId}
               appointment={appointment}
+              setOpen={setOpen}
             />
           </DialogContent>
         </Dialog>
@@ -54,7 +60,10 @@ function AppointmentModal({
           <DialogTrigger className="text-red-400 cursor-pointer">
             Cancel
           </DialogTrigger>
-          <DialogContent className="bg-gray-900 w-screen">
+          <DialogContent
+            onInteractOutside={(e) => e.preventDefault()} // ✅ Prevent close on outside click
+            className="bg-gray-900 w-screen"
+          >
             <DialogHeader className="flex flex-col items-center justify-center">
               <DialogTitle>Cancel Appointment</DialogTitle>
               <DialogDescription>
@@ -63,7 +72,7 @@ function AppointmentModal({
             </DialogHeader>
             <div className="mt-4">
               <AppointmentForm
-                type="cancel"
+                type="cancelled"
                 patientId={patientId}
                 userId={userId}
               />
