@@ -118,7 +118,25 @@ function AppointmentForm({
         const result = await updateAppointmentData(updateAppointment);
         console.log("updated result", result);
         if (result) {
-          setOpen!(false);
+          setOpen && setOpen(false);
+        }
+      } else {
+        console.log("button clicked");
+        if (!appointment?.$id) {
+          console.error("Missing appointment ID");
+          return;
+        }
+
+        const cancelAppointment = {
+          userId,
+          appointmentId: appointment?.$id,
+          cancellationReason: values.cancellationReason ?? "",
+          status: type,
+        };
+        const result = await updateAppointmentData(cancelAppointment);
+        console.log("cancel", result);
+        if (result) {
+          setOpen && setOpen(false);
         }
       }
     } catch (error: any) {
@@ -206,7 +224,7 @@ function AppointmentForm({
               placeholder="Enter reason for Cancellation"
               iconSrc=""
               iconAlt=""
-              type={FieldType.AdditionalComments}
+              type={FieldType.CancellationReason}
             />
           )}
 

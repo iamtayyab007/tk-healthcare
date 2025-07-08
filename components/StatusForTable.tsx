@@ -1,7 +1,11 @@
 import React from "react";
 import { StatusIcon } from "@/contants";
 import Image from "next/image";
-function StatusForTable({ status }: any) {
+function StatusForTable({
+  status,
+}: {
+  status: "schedule" | "cancelled" | "pending";
+}) {
   console.log("status", status);
   if (status === "schedule") {
     return (

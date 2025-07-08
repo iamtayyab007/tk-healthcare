@@ -56,7 +56,7 @@ function AppointmentModal({
       )}
 
       {cancel && (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger className="text-red-400 cursor-pointer">
             Cancel
           </DialogTrigger>
@@ -75,6 +75,8 @@ function AppointmentModal({
                 type="cancelled"
                 patientId={patientId}
                 userId={userId}
+                appointment={appointment}
+                setOpen={setOpen}
               />
             </div>
           </DialogContent>
