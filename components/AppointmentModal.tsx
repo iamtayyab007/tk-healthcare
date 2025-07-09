@@ -22,14 +22,15 @@ function AppointmentModal({
   userId: string;
   appointment?: Appointment;
 }) {
-  const [open, setOpen] = useState(false);
+  const [openSchedule, setOpenSchedule] = useState(false);
+  const [openCancel, setOpenCancel] = useState(false);
   const cancel = data.cancel;
   const schedule = data.schedule;
 
   return (
     <div className="flex gap-1">
       {schedule && (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={openSchedule} onOpenChange={setOpenSchedule}>
           <DialogTrigger className="text-green-400 cursor-pointer">
             Schedule
           </DialogTrigger>
@@ -49,14 +50,14 @@ function AppointmentModal({
               patientId={patientId}
               userId={userId}
               appointment={appointment}
-              setOpen={setOpen}
+              setOpen={setOpenSchedule}
             />
           </DialogContent>
         </Dialog>
       )}
 
       {cancel && (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={openCancel} onOpenChange={setOpenCancel}>
           <DialogTrigger className="text-red-400 cursor-pointer">
             Cancel
           </DialogTrigger>
@@ -76,7 +77,7 @@ function AppointmentModal({
                 patientId={patientId}
                 userId={userId}
                 appointment={appointment}
-                setOpen={setOpen}
+                setOpen={setOpenCancel}
               />
             </div>
           </DialogContent>
