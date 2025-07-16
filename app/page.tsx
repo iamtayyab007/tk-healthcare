@@ -3,13 +3,13 @@ import OtpVerification from "@/components/OtpVerification";
 import { PatientForm } from "@/components/PatientForm";
 import Image from "next/image";
 import Link from "next/link";
+import Cookies from "js-cookie";
 
 export default function Home({ searchParams }: SearchParamProps) {
   const isAdmin = searchParams.admin;
-  const adminAlreadyLogin = localStorage.getItem("adminOtp");
+  const adminAlreadyLogin = Cookies.get("adminOtp"); //localStorage.getItem("adminOtp");
   return (
     <div className="flex h-screen max-h-screen">
-      {/* TODO: OTP Verification | passkey modal*/}
       {isAdmin && <OtpVerification isAdmin={isAdmin} />}
 
       <section className="remove-scrollbar container my-auto">

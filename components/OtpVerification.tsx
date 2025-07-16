@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -41,7 +42,12 @@ function OtpVerification({ isAdmin }: any) {
     if (value === decrypted) {
       setSuccess(true);
       router.push("/admin");
-      localStorage.setItem("adminOtp", encrypted);
+      //localStorage.setItem("adminOtp", encrypted);
+      Cookies.set("adminOtp", encrypted, {
+        expires: 1 / 24, // expires in 1 hour (1/24 of a day)
+        path: "/", // available throughout the site
+        secure: true, // set to true in production
+      });
       setError(false);
     } else {
       setError(true);

@@ -6,7 +6,8 @@ import {
 } from "@/lib/actions/appointment.actions";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
-import { getAllPatientData } from "@/lib/actions/patients.actions";
+import LogoutButton from "@/components/LogoutButton";
+
 export default async function Admin() {
   const getAppointmentData = await getAppointmentStatus();
   const schedule = getAppointmentData.schedule;
@@ -38,6 +39,9 @@ export default async function Admin() {
             height={40}
           />
           <h3>Admin</h3>
+          <div>
+            <LogoutButton />
+          </div>
         </div>
       </header>
       <section className="flex flex-col gap-2 p-7">
