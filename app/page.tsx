@@ -4,10 +4,13 @@ import { PatientForm } from "@/components/PatientForm";
 import Image from "next/image";
 import Link from "next/link";
 import Cookies from "js-cookie";
+import { useSearchParams } from "next/navigation";
 
-export default function Home({ searchParams }: SearchParamProps) {
-  const isAdmin = searchParams.admin;
-  const adminAlreadyLogin = Cookies.get("adminOtp"); //localStorage.getItem("adminOtp");
+export default function Home() {
+  const params = useSearchParams();
+  const isAdmin = params.get("admin");
+  const adminAlreadyLogin = Cookies.get("adminOtp");
+
   return (
     <div className="flex h-screen max-h-screen">
       {isAdmin && <OtpVerification isAdmin={isAdmin} />}

@@ -10,9 +10,9 @@ import LogoutButton from "@/components/LogoutButton";
 
 export default async function Admin() {
   const getAppointmentData = await getAppointmentStatus();
-  const schedule = getAppointmentData.schedule;
-  const pending = getAppointmentData.pending;
-  const cancelled = getAppointmentData.cancelled;
+  const schedule = getAppointmentData?.schedule ?? [];
+  const pending = getAppointmentData?.pending ?? [];
+  const cancelled = getAppointmentData?.cancelled ?? [];
   //console.log("appointment", getAppointmentData);
 
   //const PatientData = await getAllPatientData();

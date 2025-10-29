@@ -30,7 +30,6 @@ function OtpVerification({ isAdmin }: any) {
   const encrypted = encrypt(adminOtp);
 
   const decrypted = decrypt(encrypted);
-  //localStorage.setItem("adminOtp", encrypted);
 
   useEffect(() => {
     if (isAdmin) {
@@ -42,7 +41,7 @@ function OtpVerification({ isAdmin }: any) {
     if (value === decrypted) {
       setSuccess(true);
       router.push("/admin");
-      //localStorage.setItem("adminOtp", encrypted);
+
       Cookies.set("adminOtp", encrypted, {
         expires: 1 / 24, // expires in 1 hour (1/24 of a day)
         path: "/", // available throughout the site

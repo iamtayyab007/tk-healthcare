@@ -1,12 +1,12 @@
 "use server";
 import { ID } from "node-appwrite";
-import { databases, messaging } from "../appwrite.config";
+import { databases, messaging, users } from "../appwrite.config";
 import { parseStringify } from "../utils";
-import { Appointment } from "@/types/appwrite.types";
 import { revalidatePath } from "next/cache";
-import { send } from "process";
+import { Resend } from "resend";
+import { EmailTemplate } from "@/components/email-template";
 const { DATABASE_ID, APPOINTMENT_COLLECTION_ID } = process.env;
-
+const resend = new Resend(process.env.RESEND_API_KEY);
 export const createAppointment = async (values: CreateAppointmentParams) => {
   try {
     const result = await databases.createDocument(
@@ -103,13 +103,17 @@ export const updateAppointmentData = async (
     if (!result) {
       throw new Error("Appointment not found!");
     }
-    const smsMessage = `Hi, it's CarePulse, your appointment has be ${
-      appointment.type === "schedule"
+    console.log("appointmentType", appointment.type);
+    const emailMessage = `Hi, it's CarePulse, ${
+      appointment.status === "schedule"
         ? `Your appointment has been scheduled for ${appointment.schedule}`
         : `we regret to inform that your appointment has been cancelled. 
         Reason ${appointment.cancellationReason}`
     }`;
-    await sendSMSNotification(appointment.userId, smsMessage);
+    console.log("emailmessage", emailMessage);
+    const subject = "Appointment Details";
+    //await sendEmailNotification(subject, emailMessage, appointment.userId);
+    await sendEmail(subject, emailMessage);
     revalidatePath("/admin");
     return parseStringify(result);
   } catch (error: any) {
@@ -117,17 +121,41 @@ export const updateAppointmentData = async (
   }
 };
 
-export const sendSMSNotification = async (userId: string, content: string) => {
-  try {
-    const message = await messaging.createSms(
-      ID.unique(),
-      content,
-      [],
-      [userId]
-    );
+// export const sendEmailNotification = async (
+//   subject: string,
+//   content: string,
+//   userId: string
+// ) => {
+//   try {
+//     const message = await messaging.createEmail(
+//       ID.unique(),
+//       subject,
+//       content,
+//       [],
+//       [userId]
+//     );
 
-    return parseStringify(message);
-  } catch (error: any) {
-    console.log(error?.response?.data || error.message);
+//     console.log("message", message);
+//     return parseStringify(message);
+//   } catch (error: any) {
+//     console.log(error?.response?.data || error.message);
+//   }
+// };
+export const sendEmail = async (subject: string, content: string) => {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "Acme <onboarding@resend.dev>",
+      to: ["tayyabm336@gmail.com"],
+      subject: subject,
+      react: EmailTemplate({ subject: subject, content: content }),
+    });
+
+    if (error) {
+      return Response.json({ error }, { status: 500 });
+    }
+
+    return Response.json(data);
+  } catch (error) {
+    return Response.json({ error }, { status: 500 });
   }
 };
