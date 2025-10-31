@@ -1,3 +1,4 @@
+"use client";
 import AppointmentForm from "@/components/AppointmentForm";
 import { getPatientData } from "@/lib/actions/patients.actions";
 import Image from "next/image";
